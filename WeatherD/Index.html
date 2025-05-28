@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Clima & Finanças</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 1s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 15px;
+        }
+
+        .panel-title i {
+            margin-right: 15px;
+            font-size: 1.8rem;
+        }
+
+        .search-container {
+            display: flex;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+
+        #city-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        #city-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #search-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 50px;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        #search-btn:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+
+        .capitals-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .capital-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .capital-btn:hover, .capital-btn.active {
+            background: rgba(52, 152, 219, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .current-weather {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        #weather-icon {
+            font-size: 6rem;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        #temperature {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #weather-description {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            text-transform: capitalize;
+            text-align: center;
+        }
+
+        .details {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 400px;
+            font-size: 1.2rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .detail-item i {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .forecast {
+            margin-top: 30px;
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
+        }
+
+        .forecast-day {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .forecast-day:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .forecast-day .day {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+
+        .forecast-day .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .forecast-day .temp {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .forecast-day .desc {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .currency-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #currency-value {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #2ecc71;
+        }
+
+        #currency-description {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .converter {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .converter-group {
+            margin-bottom: 20px;
+        }
+
+        .converter label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .converter input, .converter select {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        #convert-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #2ecc71;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        #convert-btn:hover {
+            background: #27ae60;
+            transform: scale(1.03);
+        }
+
+        #conversion-result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.3rem;
+            min-height: 40px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.1rem;
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            color: #3498db;
+            text-decoration: none;
+            margin-top: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .github-link i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+
+        .github-link:hover {
+            color: #2980b9;
+            transform: translateY(-3px);
+        }
+
+        /* Estilos para diferentes condições climáticas */
+        .sunny { background: linear-gradient(135deg, #1a2a6c, #f46b45); }
+        .rainy { background: linear-gradient(135deg, #1a2a6c, #4ca1af); }
+        .cloudy { background: linear-gradient(135deg, #1a2a6c, #5c6bc0); }
+        .night { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); }
+        .snowy { background: linear-gradient(135deg, #1a2a6c, #8e9eab); }
+        .foggy { background: linear-gradient(135deg, #1a2a6c, #636363); }
+
+        /* Responsividade */
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .capitals-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .forecast-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .forecast-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .capitals-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .details {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body class="night">
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-cloud-sun"></i> Dashboard Clima & Finanças</h1>
+            <p>Previsão do tempo para 7 dias e informações financeiras em tempo real</p>
+        </header>
+        
+        <div class="dashboard">
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-cloud-sun-rain"></i>
+                    <h2>Informações Climáticas</h2>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" id="city-input" placeholder="Digite uma cidade..." value="São Paulo">
+                    <button id="search-btn">Buscar</button>
+                </div>
+                
+                <div class="capitals-grid">
+                    <button class="capital-btn active" data-city="São Paulo">São Paulo</button>
+                    <button class="capital-btn" data-city="New York">Nova York</button>
+                    <button class="capital-btn" data-city="Tokyo">Tóquio</button>
+                    <button class="capital-btn" data-city="London">Londres</button>
+                    <button class="capital-btn" data-city="Paris">Paris</button>
+                    <button class="capital-btn" data-city="Dubai">Dubai</button>
+                </div>
+                
+                <div class="current-weather">
+                    <div id="weather-icon"><i class="fas fa-moon"></i></div>
+                    <div id="temperature">22°C</div>
+                    <div id="weather-description">Noite limpa</div>
+                    
+                    <div class="details">
+                        <div class="detail-item">
+                            <i class="fas fa-tint"></i>
+                            <div id="humidity">65%</div>
+                            <div>Umidade</div>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-wind"></i>
+                            <div id="wind">10 km/h</div>
+                            <div>Vento</div>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-compress-arrows-alt"></i>
+                            <div id="pressure">1015 hPa</div>
+                            <div>Pressão</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="forecast">
+                    <h3><i class="fas fa-calendar-week"></i> Previsão para 7 dias</h3>
+                    <div class="forecast-grid" id="forecast-container">
+                        <!-- Previsão será preenchida por JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-chart-line"></i>
+                    <h2>Informações Financeiras</h2>
+                </div>
+                
+                <div class="currency-info">
+                    <div id="currency-value">$1 = R$5.20</div>
+                    <div id="currency-description">Taxa de câmbio atual de USD para moeda local</div>
+                </div>
+                
+                <div class="converter">
+                    <div class="converter-group">
+                        <label for="amount">Valor em USD:</label>
+                        <input type="number" id="amount" placeholder="Valor em USD" value="1" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="converter-group">
+                        <label for="target-currency">Converter para:</label>
+                        <select id="target-currency">
+                            <option value="BRL">Real Brasileiro (BRL)</option>
+                            <option value="EUR">Euro (EUR)</option>
+                            <option value="JPY">Iene Japonês (JPY)</option>
+                            <option value="GBP">Libra Esterlina (GBP)</option>
+                            <option value="CAD">Dólar Canadense (CAD)</option>
+                        </select>
+                    </div>
+                    
+                    <button id="convert-btn">Converter Moeda</button>
+                    <div id="conversion-result"></div>
+                </div>
+                
+                <div class="currency-info" style="margin-top: 30px;">
+                    <div id="local-currency-value">1 Real Brasileiro = $0.19</div>
+                    <div id="local-currency-description">Valor da moeda local em USD</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Dashboard Clima & Finanças - Projeto desenvolvido com HTML, CSS e JavaScript</p>
+            <a href="#" class="github-link">
+                <i class="fab fa-github"></i>
+                Ver no GitHub
+            </a>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elementos do DOM
+            const elements = {
+                cityInput: document.getElementById('city-input'),
+                searchBtn: document.getElementById('search-btn'),
+                weatherIcon: document.getElementById('weather-icon'),
+                temperature: document.getElementById('temperature'),
+                weatherDesc: document.getElementById('weather-description'),
+                humidity: document.getElementById('humidity'),
+                wind: document.getElementById('wind'),
+                pressure: document.getElementById('pressure'),
+                body: document.body,
+                forecastContainer: document.getElementById('forecast-container'),
+                currencyValue: document.getElementById('currency-value'),
+                currencyDesc: document.getElementById('currency-description'),
+                localCurrencyValue: document.getElementById('local-currency-value'),
+                localCurrencyDesc: document.getElementById('local-currency-description'),
+                amountInput: document.getElementById('amount'),
+                targetCurrency: document.getElementById('target-currency'),
+                convertBtn: document.getElementById('convert-btn'),
+                conversionResult: document.getElementById('conversion-result')
+            };
+
+            // Dados da aplicação
+            const state = {
+                currentCity: 'São Paulo',
+                currentCountry: 'BR',
+                exchangeRates: {
+                    USD: 1,
+                    BRL: 5.20,
+                    EUR: 0.92,
+                    JPY: 144.50,
+                    GBP: 0.79,
+                    CAD: 1.35
+                },
+                weatherIcons: {
+                    'Clear': 'fas fa-sun',
+                    'Clouds': 'fas fa-cloud',
+                    'Rain': 'fas fa-cloud-rain',
+                    'Drizzle': 'fas fa-cloud-sun-rain',
+                    'Thunderstorm': 'fas fa-bolt',
+                    'Snow': 'fas fa-snowflake',
+                    'Mist': 'fas fa-smog',
+                    'Night': 'fas fa-moon'
+                },
+                weatherClasses: {
+                    'Clear': 'sunny',
+                    'Clouds': 'cloudy',
+                    'Rain': 'rainy',
+                    'Drizzle': 'rainy',
+                    'Thunderstorm': 'rainy',
+                    'Snow': 'snowy',
+                    'Mist': 'foggy',
+                    'Night': 'night'
+                }
+            };
+
+            // Inicialização
+            init();
+
+            function init() {
+                // Event listeners
+                elements.searchBtn.addEventListener('click', searchWeather);
+                elements.cityInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') searchWeather();
+                });
+                
+                document.querySelectorAll('.capital-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        // Remove active class from all buttons
+                        document.querySelectorAll('.capital-btn').forEach(b => b.classList.remove('active'));
+                        // Add active class to clicked button
+                        btn.classList.add('active');
+                        
+                        const city = btn.dataset.city;
+                        elements.cityInput.value = city;
+                        searchWeather();
+                    });
+                });
+                
+                elements.convertBtn.addEventListener('click', convertCurrency);
+                
+                // Carregar dados iniciais
+                updateWeather('São Paulo');
+                updateExchangeRate();
+                generateForecastData();
+            }
+
+            function searchWeather() {
+                const city = elements.cityInput.value.trim();
+                if (city) {
+                    updateWeather(city);
+                }
+            }
+
+            function updateWeather(city) {
+                try {
+                    state.currentCity = city;
+                    
+                    // Dados mockados para diferentes cidades
+                    const weatherData = {
+                        'são paulo': { 
+                            temp: 22, 
+                            desc: 'noite limpa', 
+                            humidity: 65, 
+                            wind: 10, 
+                            pressure: 1015,
+                            icon: 'Night',
+                            country: 'BR'
+                        },
+                        'new york': { 
+                            temp: 15, 
+                            desc: 'parcialmente nublado', 
+                            humidity: 70, 
+                            wind: 15, 
+                            pressure: 1012,
+                            icon: 'Clouds',
+                            country: 'US'
+                        },
+                        'tokyo': { 
+                            temp: 18, 
+                            desc: 'chuva leve', 
+                            humidity: 80, 
+                            wind: 8, 
+                            pressure: 1008,
+                            icon: 'Rain',
+                            country: 'JP'
+                        },
+                        'london': { 
+                            temp: 12, 
+                            desc: 'névoa', 
+                            humidity: 85, 
+                            wind: 12, 
+                            pressure: 1010,
+                            icon: 'Mist',
+                            country: 'GB'
+                        },
+                        'paris': { 
+                            temp: 17, 
+                            desc: 'céu limpo', 
+                            humidity: 75, 
+                            wind: 10, 
+                            pressure: 1013,
+                            icon: 'Clear',
+                            country: 'FR'
+                        },
+                        'dubai': { 
+                            temp: 32, 
+                            desc: 'ensolarado', 
+                            humidity: 40, 
+                            wind: 5, 
+                            pressure: 1005,
+                            icon: 'Clear',
+                            country: 'AE'
+                        }
+                    };
+                    
+                    const cityLower = city.toLowerCase();
+                    const data = weatherData[cityLower] || weatherData['são paulo'];
+                    
+                    // Atualizar UI
+                    elements.weatherIcon.innerHTML = `<i class="${state.weatherIcons[data.icon]}"></i>`;
+                    elements.temperature.textContent = `${data.temp}°C`;
+                    elements.weatherDesc.textContent = data.desc;
+                    elements.humidity.textContent = `${data.humidity}%`;
+                    elements.wind.textContent = `${data.wind} km/h`;
+                    elements.pressure.textContent = `${data.pressure} hPa`;
+                    
+                    // Atualizar fundo
+                    elements.body.className = state.weatherClasses[data.icon] || 'night';
+                    
+                    // Atualizar país para câmbio
+                    state.currentCountry = data.country;
+                    updateExchangeRate();
+                    
+                    // Atualizar previsão para 7 dias
+                    generateForecastData();
+                    
+                } catch (error) {
+                    console.error('Erro ao atualizar clima:', error);
+                    alert('Erro ao buscar dados do clima. Tente novamente.');
+                }
+            }
+
+            function updateExchangeRate() {
+                // Mapeamento de códigos de países para moedas
+                const countryToCurrency = {
+                    'BR': 'BRL',
+                    'US': 'USD',
+                    'JP': 'JPY',
+                    'GB': 'GBP',
+                    'FR': 'EUR',
+                    'AE': 'AED'
+                };
+                
+                const currency = countryToCurrency[state.currentCountry] || 'USD';
+                const rate = state.exchangeRates[currency] || 1;
+                const localRate = 1 / rate;
+                
+                // Atualizar UI
+                elements.currencyValue.textContent = `$1 = ${formatCurrency(currency, rate)}`;
+                elements.currencyDesc.textContent = `Taxa de câmbio atual de USD para ${getCurrencyName(currency)}`;
+                
+                elements.localCurrencyValue.textContent = `1 ${getCurrencyName(currency)} = ${formatCurrency('USD', localRate)}`;
+                elements.localCurrencyDesc.textContent = `Valor da moeda local em USD`;
+            }
+
+            function convertCurrency() {
+                const amount = parseFloat(elements.amountInput.value) || 1;
+                const targetCurrency = elements.targetCurrency.value;
+                const rate = state.exchangeRates[targetCurrency] || 1;
+                const converted = amount * rate;
+                
+                elements.conversionResult.textContent = 
+                    `${formatCurrency('USD', amount)} = ${formatCurrency(targetCurrency, converted)}`;
+            }
+
+            function generateForecastData() {
+                const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+                const weatherConditions = [
+                    'Ensolarado', 'Parcialmente nublado', 'Nublado', 
+                    'Chuva leve', 'Chuva moderada', 'Tempestade', 'Neve'
+                ];
+                
+                const weatherIcons = [
+                    'fas fa-sun', 'fas fa-cloud-sun', 'fas fa-cloud',
+                    'fas fa-cloud-rain', 'fas fa-cloud-showers-heavy', 
+                    'fas fa-bolt', 'fas fa-snowflake'
+                ];
+                
+                elements.forecastContainer.innerHTML = '';
+                
+                for (let i = 0; i < 7; i++) {
+                    const minTemp = Math.floor(10 + Math.random() * 10);
+                    const maxTemp = minTemp + Math.floor(5 + Math.random() * 8);
+                    const conditionIndex = Math.floor(Math.random() * weatherConditions.length);
+                    
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'forecast-day';
+                    dayElement.innerHTML = `
+                        <div class="day">${i === 0 ? 'Hoje' : days[(new Date().getDay() + i) % 7]}</div>
+                        <div class="icon"><i class="${weatherIcons[conditionIndex]}"></i></div>
+                        <div class="temp">${minTemp}° / ${maxTemp}°</div>
+                        <div class="desc">${weatherConditions[conditionIndex]}</div>
+                    `;
+                    
+                    elements.forecastContainer.appendChild(dayElement);
+                }
+            }
+
+            // Funções auxiliares
+            function formatCurrency(currency, value) {
+                const symbols = {
+                    'USD': '$',
+                    'BRL': 'R$',
+                    'EUR': '€',
+                    'JPY': '¥',
+                    'GBP': '£',
+                    'CAD': 'C$',
+                    'AED': 'AED '
+                };
+                
+                return `${symbols[currency] || currency} ${value.toFixed(2)}`;
+            }
+
+            function getCurrencyName(currency) {
+                const names = {
+                    'USD': 'Dólar Americano',
+                    'BRL': 'Real Brasileiro',
+                    'EUR': 'Euro',
+                    'JPY': 'Iene Japonês',
+                    'GBP': 'Libra Esterlina',
+                    'CAD': 'Dólar Canadense',
+                    'AED': 'Dirham dos Emirados'
+                };
+                
+                return names[currency] || currency;
+            }
+
+            // Simular atualização de câmbio a cada minuto
+            setInterval(() => {
+                // Simular pequenas variações nas taxas de câmbio
+                Object.keys(state.exchangeRates).forEach(currency => {
+                    if (currency !== 'USD') {
+                        const change = 0.01 * (Math.random() - 0.5);
+                        state.exchangeRates[currency] = 
+                            Math.max(0.5, state.exchangeRates[currency] + change);
+                    }
+                });
+                updateExchangeRate();
+            }, 60000);
+        });
+    </script>
+</body>
+</html>
